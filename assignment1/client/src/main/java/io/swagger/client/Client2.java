@@ -78,7 +78,7 @@ public class Client2 {
             try {
               sae.doPost(skierId, liftId, time);
               client.successInc();
-            } catch (ApiException e) {
+            } catch (Exception e) {
               client.failureInc();
             } finally {
               long afterPost = new Timestamp(System.currentTimeMillis()).getTime();
@@ -112,7 +112,7 @@ public class Client2 {
             try {
               sae.doPost(skierId, liftId, time);
               client.successInc();
-            } catch (ApiException e) {
+            } catch (Exception e) {
               client.failureInc();
             } finally {
               long afterPost = new Timestamp(System.currentTimeMillis()).getTime();
@@ -147,7 +147,7 @@ public class Client2 {
             try {
               sae.doPost(skierId, liftId, time);
               client.successInc();
-            } catch (ApiException e) {
+            } catch (Exception e) {
               client.failureInc();
             } finally {
               long afterPost = new Timestamp(System.currentTimeMillis()).getTime();

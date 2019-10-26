@@ -14,7 +14,7 @@ public class ResortsApiExample {
 
     ResortsApi apiInstance = new ResortsApi();
     ApiClient client = apiInstance.getApiClient();
-    String basePath = "http://54.211.60.243:8080/server_war";
+    String basePath = "http://skier-1649773410.us-west-2.elb.amazonaws.com/server_war";
     client.setBasePath(basePath);
     try {
       List result = apiInstance.getResorts();

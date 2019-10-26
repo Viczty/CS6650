@@ -6,11 +6,15 @@ import io.swagger.client.model.*;
 import io.swagger.client.api.ResortsApi;
 import io.swagger.client.api.SkiersApi;
 
+import java.io.BufferedReader;
 import java.io.FileWriter;
+import java.io.InputStreamReader;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
 import java.util.Random;
 
@@ -25,8 +29,9 @@ public class MultiThreadClient {
   private int success = 0;
   private int failure = 0;
 
-  List<Long> latency = new ArrayList<>();
-  List<String> output = new ArrayList<>();
+  List<Long> latency = Collections.synchronizedList(new ArrayList<Long>());
+  List<String> output = Collections.synchronizedList(new ArrayList<String>());
+
 
   public synchronized void successInc() {
     success++;
@@ -34,14 +39,6 @@ public class MultiThreadClient {
 
   public synchronized void failureInc() {
     failure++;
-  }
-
-  public synchronized  void addLatency(Long line) {
-    latency.add(line);
-  }
-
-  public synchronized  void addOut(String line) {
-    output.add(line);
   }
 
   public MultiThreadClient(int numThreads, int numSkiers, int numLifts, int numRuns, String IP) {
@@ -55,7 +52,10 @@ public class MultiThreadClient {
   public static void main(String[] args) throws InterruptedException {
     final ResortsApiExample rae = new ResortsApiExample();
     final SkiersApiExample sae = new SkiersApiExample();
-    final MultiThreadClient client = new MultiThreadClient(32, 20000, 40, 20, "http://54.211.60.243:8080/server_war");
+    System.out.println("Enter number of threads: ");
+    Scanner scanner = new Scanner(System.in);
+    int threads = Integer.valueOf(scanner.nextLine());
+    final MultiThreadClient client = new MultiThreadClient(threads, 20000, 40, 20, "http://54.211.60.243:8080/server_war");
     final CountDownLatch total = new CountDownLatch(numThreads + numThreads / 2);
     final CountDownLatch phase1 = new CountDownLatch(numThreads / 10);
     final CountDownLatch phase2 = new CountDownLatch(numThreads / 10);
@@ -66,27 +66,39 @@ public class MultiThreadClient {
     long before = timestamp.getTime();
 
     for (int i = 0; i < numThreads / 4; i++) {
-      Runnable thread =  () -> {
+      Runnable thread = () -> {
         try {
           // wait for the main thread to tell us to start
           int skiers = client.numSkiers / (client.numThreads / 4);
           for (int j = 0; j < client.numRuns * 0.1 * skiers; j++) {
-            int skierId = random.nextInt(client.numSkiers);
-            int liftId = random.nextInt(client.numLifts);
-            int time = 1 + random.nextInt(90);
+            boolean added = false;
             Timestamp start = new Timestamp(System.currentTimeMillis());
             long beforePost = start.getTime();
-            try {
-              sae.doPost(skierId, liftId, time);
-              client.successInc();
-            } catch (ApiException e) {
-              client.failureInc();
-            } finally {
-              long afterPost = new Timestamp(System.currentTimeMillis()).getTime();
-              String current = start.toString() + ",POST," + (afterPost - beforePost) + ",201";
-              client.addLatency(afterPost - beforePost);
-              client.addOut(current);
+            while (!added) {
+              int skierId = random.nextInt(client.numSkiers);
+              int liftId = random.nextInt(client.numLifts);
+              int time = 1 + random.nextInt(90);
+              start = new Timestamp(System.currentTimeMillis());
+              beforePost = start.getTime();
+              try {
+                sae.doPost(skierId, liftId, time);
+                client.successInc();
+                added = true;
+              } catch (Exception e) {
+                added = false;
+                client.failureInc();
+              }
             }
+            long afterPost = new Timestamp(System.currentTimeMillis()).getTime();
+            String current = start.toString() + ",POST," + (afterPost - beforePost) + ",201";
+            synchronized (client.latency) {
+              client.latency.add(afterPost - beforePost);
+            }
+            synchronized (client.output) {
+              client.output.add(current);
+            }
+
+
           }
         } finally {
           // we've finished - let the main thread know
@@ -100,27 +112,38 @@ public class MultiThreadClient {
     phase1.await();
 
     for (int i = 0; i < numThreads; i++) {
-      Runnable thread =  () -> {
+      Runnable thread = () -> {
         try {
           // wait for the main thread to tell us to start
           int skiers = client.numSkiers / client.numThreads;
           for (int j = 0; j < client.numRuns * 0.8 * skiers; j++) {
-            int skierId = random.nextInt(client.numSkiers);
-            int liftId = random.nextInt(client.numLifts);
-            int time = 91 + random.nextInt(270);
+            boolean added = false;
             Timestamp start = new Timestamp(System.currentTimeMillis());
             long beforePost = start.getTime();
-            try {
-              sae.doPost(skierId, liftId, time);
-              client.successInc();
-            } catch (ApiException e) {
-              client.failureInc();
-            } finally {
-              long afterPost = new Timestamp(System.currentTimeMillis()).getTime();
-              String current = start.toString() + ",POST," + (afterPost - beforePost) + ",201";
-              client.addLatency(afterPost - beforePost);
-              client.addOut(current);
+            while (!added) {
+              int skierId = random.nextInt(client.numSkiers);
+              int liftId = random.nextInt(client.numLifts);
+              int time = 91 + random.nextInt(270);
+              start = new Timestamp(System.currentTimeMillis());
+              beforePost = start.getTime();
+              try {
+                sae.doPost(skierId, liftId, time);
+                client.successInc();
+                added = true;
+              } catch (Exception e) {
+                added = false;
+                client.failureInc();
+              }
             }
+            long afterPost = new Timestamp(System.currentTimeMillis()).getTime();
+            String current = start.toString() + ",POST," + (afterPost - beforePost) + ",201";
+            synchronized (client.latency) {
+              client.latency.add(afterPost - beforePost);
+            }
+            synchronized (client.output) {
+              client.output.add(current);
+            }
+
           }
         } finally {
           // we've finished - let the main thread know
@@ -135,27 +158,39 @@ public class MultiThreadClient {
     phase2.await();
 
     for (int i = 0; i < numThreads / 4; i++) {
-      Runnable thread =  () -> {
+      Runnable thread = () -> {
         try {
           // wait for the main thread to tell us to start
           int skiers = client.numSkiers / (client.numThreads / 4);
           for (int j = 0; j < client.numRuns * 0.1 * skiers; j++) {
-            int skierId = random.nextInt(client.numSkiers);
-            int liftId = random.nextInt(client.numLifts);
-            int time = 361 + random.nextInt(60);
+            boolean added = false;
             Timestamp start = new Timestamp(System.currentTimeMillis());
             long beforePost = start.getTime();
-            try {
-              sae.doPost(skierId, liftId, time);
-              client.successInc();
-            } catch (ApiException e) {
-              client.failureInc();
-            } finally {
-              long afterPost = new Timestamp(System.currentTimeMillis()).getTime();
-              String current = start.toString() + ",POST," + (afterPost - beforePost) + ",201";
-              client.addLatency(afterPost - beforePost);
-              client.addOut(current);
+            while (!added) {
+              int skierId = random.nextInt(client.numSkiers);
+              int liftId = random.nextInt(client.numLifts);
+              int time = 361 + random.nextInt(60);
+              start = new Timestamp(System.currentTimeMillis());
+              beforePost = start.getTime();
+              try {
+                sae.doPost(skierId, liftId, time);
+                sae.doGet(skierId, liftId, time);
+                client.successInc();
+                added = true;
+              } catch (Exception e) {
+                added = false;
+                client.failureInc();
+              }
             }
+            long afterPost = new Timestamp(System.currentTimeMillis()).getTime();
+            String current = start.toString() + ",POST," + (afterPost - beforePost) + ",201";
+            synchronized (client.latency) {
+              client.latency.add(afterPost - beforePost);
+            }
+            synchronized (client.output) {
+              client.output.add(current);
+            }
+
           }
         } finally {
           // we've finished - let the main thread know
@@ -173,7 +208,7 @@ public class MultiThreadClient {
     long after = timestamp.getTime();
     // Client1
     System.out.println("success " + client.success);
-    System.out.println("failure " + (400000 - client.success));
+    System.out.println("failure " + client.failure);
     System.out.println("wall time " + (after - before));
 
     FileWriter fileWriter = null;
@@ -205,11 +240,28 @@ public class MultiThreadClient {
     for (Long res : response) {
       sum += res;
     }
+
     // Client2
     System.out.println("mean " + sum / response.length);
     System.out.println("median " + response[response.length / 2]);
-    System.out.println("throughput " + response.length / (float)sum);
-    System.out.println("p99 " + response[(int)(response.length * 0.99)]);
+    System.out.println("throughput " + 1000 * response.length / (float) (after - before));
+    System.out.println("p99 " + response[(int) (response.length * 0.99)]);
     System.out.println("max " + response[response.length - 1]);
+
+    try {
+      Process	p = Runtime.getRuntime().exec("curl http://skier-1649773410.us-west-2.elb.amazonaws.com/server_war/statistics");
+      p.waitFor();
+      BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+      String line = "";
+      StringBuilder output = new StringBuilder();
+      while ((line = reader.readLine())!= null)
+      {
+        output.append(line + "\n");
+      }
+      System.out.println(output.toString());
+    } catch(Exception e) {
+      e.printStackTrace();
+    }
+
   }
 }
