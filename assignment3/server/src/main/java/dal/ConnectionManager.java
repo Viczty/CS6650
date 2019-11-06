@@ -55,8 +55,10 @@ public class ConnectionManager {
 		Connection connection = null;
 		try {
 			Properties connectionProperties = new Properties();
-			connectionProperties.put("user", this.user);
-			connectionProperties.put("password", this.password);
+//			connectionProperties.put("user", this.user);
+//			connectionProperties.put("password", this.password);
+			connectionProperties.put("user", "root");
+			connectionProperties.put("password", "zty199261");
 			connectionProperties.put("serverTimezone", this.timezone);
 			// Ensure the JDBC driver is loaded by retrieving the runtime Class descriptor.
 			// Otherwise, Tomcat may have issues loading libraries in the proper order.
@@ -67,7 +69,7 @@ public class ConnectionManager {
 				e.printStackTrace();
 			}
 			connection = DriverManager.getConnection(
-			    "jdbc:mysql://" + this.hostName + "/" + this.schema + "?useSSL=false",
+			    "jdbc:mysql://" + "34.94.5.233" + "/" + this.schema + "?useSSL=false",
 			    connectionProperties);
 		} catch (SQLException e) {
 			e.printStackTrace();
