@@ -12,7 +12,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
 
 import dal.ResortsDao;
 import dal.StatisticsDao;
@@ -32,14 +31,13 @@ public class ResortServlet extends HttpServlet {
 
   protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
     String urlPath = req.getPathInfo();
-    DataSource pool = (DataSource) getServletContext().getAttribute("my-pool");
     // check we have a URL!
     if (urlPath == null || urlPath.isEmpty()) {
       ResortsList resortsList = null;
-      try (Connection conn = pool.getConnection()){
+      try {
         Timestamp start = new Timestamp(System.currentTimeMillis());
         long beforeGet = start.getTime();
-        resortsList = new ResortsList(resortsDao.getResorts(conn));
+        resortsList = new ResortsList(resortsDao.getResorts());
         Timestamp after = new Timestamp(System.currentTimeMillis());
         long afterGet = after.getTime();
         int time = (int)(afterGet - beforeGet);

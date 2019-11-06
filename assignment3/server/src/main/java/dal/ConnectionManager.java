@@ -40,7 +40,7 @@ public class ConnectionManager {
 	// private final String password = "zty199261";
 	private final String password = System.getenv("DB_PASS");
 	// URI to your database server. If running on the same machine, then this is "localhost".
-	private final String hostName = System.getenv("CLOUD_SQL_INSTANCE_NAME");
+	private final String hostName = System.getenv("CLOUD_SQL_HOSTNAME");
 	// private final String hostName = "localhost";
 	// Port to your database server. By defaul database-1.cpyfhaatedas.us-west-2.rds.amazonaws.com, this is 3307.
 	// private final int port= 3306;
@@ -66,9 +66,10 @@ public class ConnectionManager {
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			}
-			connection = DriverManager.getConnection(
+			 connection = DriverManager.getConnection(
 			    "jdbc:mysql://" + this.hostName + "/" + this.schema + "?useSSL=false",
 			    connectionProperties);
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw e;

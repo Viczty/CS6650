@@ -6,7 +6,8 @@
         <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
     </system-properties>
     <env-variables>
-        <env-var name="CLOUD_SQL_INSTANCE_NAME" value="34.94.5.233" />
+        <env-var name="CLOUD_SQL_INSTANCE_NAME" value="my-project:region:instance" />
+        <env-var name="CLOUD_SQL_HOSTNAME" value="34.94.5.233" />
         <env-var name="DB_USER" value="root" />
         <env-var name="DB_PASS" value="zty199261" />
         <env-var name="DB_NAME" value="SkiData" />
