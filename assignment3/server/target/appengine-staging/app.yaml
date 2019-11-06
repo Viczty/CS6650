@@ -1,0 +1,52 @@
+runtime: java8
+inbound_services:
+- warmup
+derived_file_type:
+- java_precompiled
+threadsafe: True
+auto_id_policy: default
+env_variables:
+  'DB_PASS': 'zty199261'
+  'DB_USER': 'root'
+  'DB_NAME': 'SkiData'
+  'CLOUD_SQL_INSTANCE_NAME': '34.94.5.233'
+api_version: 'none'
+handlers:
+- url: /
+  script: unused
+  login: optional
+  secure: optional
+- url: /_ah/.*
+  script: unused
+  login: optional
+  secure: optional
+- url: /statistics
+  script: unused
+  login: optional
+  secure: optional
+- url: /statistics/.*
+  script: unused
+  login: optional
+  secure: optional
+- url: /resorts
+  script: unused
+  login: optional
+  secure: optional
+- url: /resorts/.*
+  script: unused
+  login: optional
+  secure: optional
+- url: /skiers
+  script: unused
+  login: optional
+  secure: optional
+- url: /.*/
+  script: unused
+  login: optional
+  secure: optional
+- url: /skiers/.*
+  script: unused
+  login: optional
+  secure: optional
+
+skip_files: app.yaml

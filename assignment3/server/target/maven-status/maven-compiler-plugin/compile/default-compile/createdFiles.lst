@@ -1,0 +1,16 @@
+dal\StatisticsDao.class
+model\SeasonsList.class
+model\Statistics.class
+dal\ConnectionManager.class
+model\Skier.class
+model\VerticalList.class
+ResortServlet.class
+dal\ResortsDao.class
+model\VerticalPair.class
+model\Resort.class
+model\LiftRide.class
+model\ResortsList.class
+SkierServlet.class
+StatisticsServlet.class
+dal\SkiersDao.class
+model\StatisticsList.class
