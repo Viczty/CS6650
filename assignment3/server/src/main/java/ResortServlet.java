@@ -37,12 +37,12 @@ public class ResortServlet extends HttpServlet {
       try {
         Timestamp start = new Timestamp(System.currentTimeMillis());
         long beforeGet = start.getTime();
-        // resortsList = new ResortsList(resortsDao.getResorts());
+        resortsList = new ResortsList(resortsDao.getResorts());
         Timestamp after = new Timestamp(System.currentTimeMillis());
         long afterGet = after.getTime();
         int time = (int)(afterGet - beforeGet);
         // statisticsDao.update("/resorts", "GET", time, time);
-      } catch (Exception e) {
+      } catch (SQLException e) {
         e.printStackTrace();
       }
 
