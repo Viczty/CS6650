@@ -1,7 +1,6 @@
 dal\StatisticsDao.class
 model\SeasonsList.class
 model\Statistics.class
-dal\ConnectionPoolContextListener.class
 dal\ConnectionManager.class
 model\Skier.class
 model\VerticalList.class
