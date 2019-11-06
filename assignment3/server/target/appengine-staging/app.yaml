@@ -8,8 +8,9 @@ auto_id_policy: default
 env_variables:
   'DB_PASS': 'zty199261'
   'DB_USER': 'root'
+  'CLOUD_SQL_CONNECTION_NAME': 'my-project-1555284861245:us-west2:database'
   'DB_NAME': 'SkiData'
-  'CLOUD_SQL_INSTANCE_NAME': '34.94.5.233'
+  'CLOUD_SQL_HOSTNAME': '34.94.5.233'
 api_version: 'none'
 handlers:
 - url: /

@@ -58,14 +58,14 @@ public class ResortsDao {
     }
   }
 
-  public List<Resort> getResorts() throws SQLException{
+  public List<Resort> getResorts(Connection connection) throws SQLException{
     String tmp = "SELECT * FROM Resorts;";
-    Connection connection = null;
+    //Connection connection = null;
     PreparedStatement selectStatement = null;
     ResultSet results = null;
 
     try {
-      connection = connectionManager.getConnection();
+      //connection = connectionManager.getConnection();
       selectStatement = connection.prepareStatement(tmp);
       results = selectStatement.executeQuery();
       List<Resort> list = new ArrayList<>();
