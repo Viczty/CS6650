@@ -166,21 +166,27 @@ public class MultiThreadClient {
             boolean added = false;
             Timestamp start = new Timestamp(System.currentTimeMillis());
             long beforePost = start.getTime();
+            int skierId = 0, liftId = 0, time = 0;
             while (!added) {
-              int skierId = random.nextInt(client.numSkiers);
-              int liftId = random.nextInt(client.numLifts);
-              int time = 361 + random.nextInt(60);
+              skierId = random.nextInt(client.numSkiers);
+              liftId = random.nextInt(client.numLifts);
+              time = 361 + random.nextInt(60);
               start = new Timestamp(System.currentTimeMillis());
               beforePost = start.getTime();
               try {
                 sae.doPost(skierId, liftId, time);
-                sae.doGet(skierId, liftId, time);
+
                 client.successInc();
                 added = true;
-              } catch (Exception e) {
+              } catch (ApiException e) {
                 added = false;
                 client.failureInc();
               }
+            }
+            try {
+              sae.doGet(skierId, liftId, time);
+            } catch (Exception e) {
+
             }
             long afterPost = new Timestamp(System.currentTimeMillis()).getTime();
             String current = start.toString() + ",POST," + (afterPost - beforePost) + ",201";

@@ -52,25 +52,27 @@ public class ConnectionManager {
 	// Name of the MySQL schema that contains your tables.
 	// Default timezone for MySQL server.
 	private final String timezone = "UTC";
-
+	private DataSource pool = null;
 	/** Get the connection to the database instance. */
 	public Connection getConnection() throws SQLException {
-		HikariConfig config = new HikariConfig();
+		if (pool == null) {
+			HikariConfig config = new HikariConfig();
 
-		// Configure which instance and what database user to connect with.
-		config.setJdbcUrl(String.format("jdbc:mysql:///%s", DB_NAME));
-		config.setUsername(DB_USER); // e.g. "root", "postgres"
-		config.setPassword(DB_PASS); // e.g. "my-password"
+			// Configure which instance and what database user to connect with.
+			config.setJdbcUrl(String.format("jdbc:mysql:///%s", DB_NAME));
+			config.setUsername(DB_USER); // e.g. "root", "postgres"
+			config.setPassword(DB_PASS); // e.g. "my-password"
 
-		// For Java users, the Cloud SQL JDBC Socket Factory can provide authenticated connections.
-		// See https://github.com/GoogleCloudPlatform/cloud-sql-jdbc-socket-factory for details.
-		config.addDataSourceProperty("socketFactory", "com.google.cloud.sql.mysql.SocketFactory");
-		config.addDataSourceProperty("cloudSqlInstance", CLOUD_SQL_CONNECTION_NAME);
-		config.addDataSourceProperty("useSSL", "false");
+			// For Java users, the Cloud SQL JDBC Socket Factory can provide authenticated connections.
+			// See https://github.com/GoogleCloudPlatform/cloud-sql-jdbc-socket-factory for details.
+			config.addDataSourceProperty("socketFactory", "com.google.cloud.sql.mysql.SocketFactory");
+			config.addDataSourceProperty("cloudSqlInstance", CLOUD_SQL_CONNECTION_NAME);
+			config.addDataSourceProperty("useSSL", "false");
 
-		// Initialize the connection pool using the configuration object.
-		DataSource pool = new HikariDataSource(config);
-		// [END cloud_sql_mysql_servlet_create]
+			// Initialize the connection pool using the configuration object.
+			pool = new HikariDataSource(config);
+			// [END cloud_sql_mysql_servlet_create]
+		}
 		return pool.getConnection();
 	}
 

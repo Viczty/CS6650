@@ -55,7 +55,7 @@ public class SkierServlet extends javax.servlet.http.HttpServlet {
         Timestamp after = new Timestamp(System.currentTimeMillis());
         long afterGet = after.getTime();
         int time = (int)(afterGet - beforeGet);
-        statisticsDao.update("/skiers/{resortID}/seasons/{seasonID}/days/{dayID}/skiers/{skierID}", "GET", time, time);
+        // statisticsDao.update("/skiers/{resortID}/seasons/{seasonID}/days/{dayID}/skiers/{skierID}", "GET", time, time);
 
       } catch (SQLException e) {
         e.printStackTrace();
@@ -76,7 +76,7 @@ public class SkierServlet extends javax.servlet.http.HttpServlet {
         Timestamp after = new Timestamp(System.currentTimeMillis());
         long afterGet = after.getTime();
         int time = (int)(afterGet - beforeGet);
-        statisticsDao.update("/skiers/{skierID}/vertical", "GET", time, time);
+        // statisticsDao.update("/skiers/{skierID}/vertical", "GET", time, time);
 
       } catch (SQLException e) {
         e.printStackTrace();
@@ -128,7 +128,7 @@ public class SkierServlet extends javax.servlet.http.HttpServlet {
         Timestamp after = new Timestamp(System.currentTimeMillis());
         long afterGet = after.getTime();
         int time = (int)(afterGet - beforeGet);
-        statisticsDao.update("/skiers/{resortID}/seasons/{seasonID}/days/{dayID}/skiers/{skierID}", "POST", time, time);
+        // statisticsDao.update("/skiers/{resortID}/seasons/{seasonID}/days/{dayID}/skiers/{skierID}", "POST", time, time);
 
       } catch (SQLException e) {
         e.printStackTrace();
