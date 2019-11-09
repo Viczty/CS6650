@@ -8,7 +8,7 @@ public class SkiersApiExample {
 
     SkiersApi apiInstance = new SkiersApi();
     ApiClient client = apiInstance.getApiClient();
-    String basePath = "http://skier-1649773410.us-west-2.elb.amazonaws.com/server_war";
+    String basePath = "https://my-project-1555284861245.appspot.com";
     client.setBasePath(basePath);
 
     LiftRide lift = new LiftRide();
@@ -22,7 +22,7 @@ public class SkiersApiExample {
 
     SkiersApi apiInstance = new SkiersApi();
     ApiClient client = apiInstance.getApiClient();
-    String basePath = "http://skier-1649773410.us-west-2.elb.amazonaws.com/server_war";
+    String basePath = "https://my-project-1555284861245.appspot.com";
     client.setBasePath(basePath);
 
     String total = apiInstance.getSkierDayVertical(2019, "1", "123", skierId);

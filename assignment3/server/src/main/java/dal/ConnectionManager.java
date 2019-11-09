@@ -1,9 +1,11 @@
 package dal;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Properties;
+import javax.sql.DataSource;
 
 /**
  * Use dal.ConnectionManager to connect to your database instance.
@@ -35,46 +37,41 @@ public class ConnectionManager {
 
 	// User to connect to your database instance. By default, this is "root2".
 	// private final String user = "root";
-	private final String user = System.getenv("DB_USER");
+	private static final String CLOUD_SQL_CONNECTION_NAME = System.getenv(
+			"CLOUD_SQL_CONNECTION_NAME");
+	private final String DB_USER = System.getenv("DB_USER");
 	// Password for the user.
 	// private final String password = "zty199261";
-	private final String password = System.getenv("DB_PASS");
+	private final String DB_PASS = System.getenv("DB_PASS");
 	// URI to your database server. If running on the same machine, then this is "localhost".
-	private final String hostName = System.getenv("CLOUD_SQL_HOSTNAME");
+	private final String DB_NAME = System.getenv("DB_NAME");
 	// private final String hostName = "localhost";
 	// Port to your database server. By defaul database-1.cpyfhaatedas.us-west-2.rds.amazonaws.com, this is 3307.
 	// private final int port= 3306;
 	// private final String port= System.getenv("MYSQL_PORT");
 	// Name of the MySQL schema that contains your tables.
-	private final String schema = "SkiData";
 	// Default timezone for MySQL server.
 	private final String timezone = "UTC";
 
 	/** Get the connection to the database instance. */
 	public Connection getConnection() throws SQLException {
-		Connection connection = null;
-		try {
-			Properties connectionProperties = new Properties();
-			connectionProperties.put("user", this.user);
-			connectionProperties.put("password", this.password);
-			connectionProperties.put("serverTimezone", this.timezone);
-			// Ensure the JDBC driver is loaded by retrieving the runtime Class descriptor.
-			// Otherwise, Tomcat may have issues loading libraries in the proper order.
-			// One alternative is calling this in the HttpServlet init() override.
-			try {
-				Class.forName("com.mysql.cj.jdbc.Driver");
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			}
-			 connection = DriverManager.getConnection(
-			    "jdbc:mysql://" + this.hostName + "/" + this.schema + "?useSSL=false",
-			    connectionProperties);
+		HikariConfig config = new HikariConfig();
 
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw e;
-		}
-		return connection;
+		// Configure which instance and what database user to connect with.
+		config.setJdbcUrl(String.format("jdbc:mysql:///%s", DB_NAME));
+		config.setUsername(DB_USER); // e.g. "root", "postgres"
+		config.setPassword(DB_PASS); // e.g. "my-password"
+
+		// For Java users, the Cloud SQL JDBC Socket Factory can provide authenticated connections.
+		// See https://github.com/GoogleCloudPlatform/cloud-sql-jdbc-socket-factory for details.
+		config.addDataSourceProperty("socketFactory", "com.google.cloud.sql.mysql.SocketFactory");
+		config.addDataSourceProperty("cloudSqlInstance", CLOUD_SQL_CONNECTION_NAME);
+		config.addDataSourceProperty("useSSL", "false");
+
+		// Initialize the connection pool using the configuration object.
+		DataSource pool = new HikariDataSource(config);
+		// [END cloud_sql_mysql_servlet_create]
+		return pool.getConnection();
 	}
 
 	/** Close the connection to the database instance. */

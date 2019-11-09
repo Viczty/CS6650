@@ -8,7 +8,7 @@ public class StatisticsApiExample {
 
     StatisticsApi apiInstance = new StatisticsApi();
     ApiClient client = apiInstance.getApiClient();
-    String basePath = "http://skier-1649773410.us-west-2.elb.amazonaws.com/server_war";
+    String basePath = "https://my-project-1555284861245.appspot.com";
     client.setBasePath(basePath);
 
     APIStats apiStats = apiInstance.getPerformanceStats();
