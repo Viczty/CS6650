@@ -22,11 +22,15 @@ Copyright 2016 Google Inc.
     The parent pom defines common style checks and testing strategies for our samples.
     Removing or replacing it should not affect the execution of the samples in anyway.
   -->
-
   <properties>
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
+    <failOnMissingWebXml>false</failOnMissingWebXml>
   </properties>
+  <!--<properties>-->
+    <!--<maven.compiler.target>1.8</maven.compiler.target>-->
+    <!--<maven.compiler.source>1.8</maven.compiler.source>-->
+  <!--</properties>-->
 
   <dependencies>
     <dependency>
@@ -74,6 +78,12 @@ Copyright 2016 Google Inc.
       <artifactId>HikariCP</artifactId>
       <version>3.3.1</version>
     </dependency>
+    <dependency>
+      <groupId>com.example.appengine.demo</groupId>
+      <artifactId>simple-jetty-main</artifactId>
+      <version>1</version>
+      <scope>provided</scope>
+    </dependency>
     <!-- Test Dependencies -->
 
     <dependency>
@@ -110,8 +120,8 @@ Copyright 2016 Google Inc.
   </dependencies>
   <build>
     <!-- for hot reload of the web application -->
-    <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/classes
-    </outputDirectory>
+    <!--<outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/classes-->
+    <!--</outputDirectory>-->
     <plugins>
       <plugin>
         <groupId>com.google.cloud.tools</groupId>
@@ -121,6 +131,26 @@ Copyright 2016 Google Inc.
           <deploy.promote>true</deploy.promote>
           <deploy.stopPreviousVersion>true</deploy.stopPreviousVersion>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.1.1</version>
+        <executions>
+          <execution>
+            <id>copy</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>
+                ${project.build.directory}/appengine-staging
+              </outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
 
       <plugin>

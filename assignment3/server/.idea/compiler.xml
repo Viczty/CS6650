@@ -9,7 +9,7 @@
         <module name="appengine-requests-j8" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
+    <bytecodeTargetLevel target="1.8">
       <module name="appengine-requests-j8" target="1.8" />
     </bytecodeTargetLevel>
   </component>
